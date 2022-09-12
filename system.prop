@@ -6,11 +6,8 @@ ro.product.system.device=gta8wifi
 ro.product.system.manufacturer=samsung
 ro.product.system.model=SM-X200
 ro.product.system.name=gta8wifixx
-ro.product.first_api_level=30
-ro.vendor.build.security_patch=2022-05-01
 ro.boot.dynamic_partitions=true
 ro.treble.enabled=true
 ro.adb.secure=0
 
-persist.sys.usb.config=mtp,adb
 sys.usb.controller=musb-hdrc.0.auto
