@@ -6,6 +6,7 @@ ro.product.system.device=gta8wifi
 ro.product.system.manufacturer=samsung
 ro.product.system.model=SM-X200
 ro.product.system.name=gta8wifixx
+ro.boot.bootdevice=7824900.sdhci
 ro.boot.dynamic_partitions=true
 ro.treble.enabled=true
 ro.adb.secure=0
