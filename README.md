@@ -6,7 +6,7 @@
 To initialize your local repository using the AOSP trees to build TWRP, use a command like this:
 
 ```sh
-repo init --depth=1 -u git://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-11
+repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
 ```
 Then to sync up:
 
