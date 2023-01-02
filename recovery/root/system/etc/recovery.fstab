@@ -72,4 +72,4 @@ product /product ext4 ro,barrier=1 wait,avb=vbmeta,logical,first_stage_mount
 
 /dev/block/by-name/metadata /metadata    ext4   nodev,noatime,nosuid,errors=panic	wait,formattable,first_stage_mount,check
 /dev/block/by-name/cache    /cache       ext4   noatime,nosuid,nodev,nomblk_io_submit,noauto_da_alloc	wait,check
-/dev/block/by-name/userdata /data        f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678,inlinecrypt	latemount,wait,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized,keydirectory=/metadata/vold/metadata_encryption,check,reservedsize=128M,checkpoint=fs,,quota
+/dev/block/by-name/userdata /data        f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678	latemount,wait,encryptable,check,reservedsize=128M,checkpoint=fs,,quota

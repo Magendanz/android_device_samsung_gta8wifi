@@ -1,14 +1,11 @@
 ro.display.series=Samsung Galaxy Tab A8 10.4
-ro.product.board=ums512_wifionly
 ro.board.platform=ums512
 ro.product.system.brand=samsung
 ro.product.system.device=gta8wifi
 ro.product.system.manufacturer=samsung
 ro.product.system.model=SM-X200
-ro.product.system.name=gta8wifixx
 ro.boot.bootdevice=7824900.sdhci
 ro.boot.dynamic_partitions=true
-ro.treble.enabled=true
 ro.adb.secure=0
 
 sys.usb.controller=musb-hdrc.0.auto

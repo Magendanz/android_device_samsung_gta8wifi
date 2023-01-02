@@ -1,0 +1,494 @@
+#
+## Please include it in /init.recovery.${ro.hardware}.rc
+#
+
+service healthd /system/bin/healthd -r
+    critical
+    seclabel u:r:healthd:s0
+
+service modem_ctl-cali /vendor/bin/modem_control
+    class cali
+    user root
+    group system radio shell
+    oneshot
+
+service modem_ctl-ft /vendor/bin/modem_control
+    class factorytest
+    user root
+    group system radio shell
+    oneshot
+
+service logd-cali /system/bin/logd
+    class cali
+    socket logd stream 0666 logd logd
+    socket logdr seqpacket 0666 logd logd
+    socket logdw dgram 0222 logd logd
+    file /proc/kmsg r
+    file /dev/kmsg w
+    user logd
+    seclabel u:r:logd:s0
+
+service vendor.wpa_supplicant /vendor/bin/hw/wpa_supplicant \
+    -Dnl80211 -iwlan0 -c/data/vendor/wifi/wpa/wpa_supplicant.conf \
+    -e/data/vendor/wifi/entropy.bin -g@android:wpa_wlan0 -dd
+    group system wifi inet keystore
+    socket wpa_wlan0 dgram 660 wifi wifi
+    disabled
+    oneshot
+
+service wcnd-cali /vendor/bin/connmgr -R
+    class cali
+    user root
+    group root system shell wifi inet bluetooth
+    seclabel u:r:wcnd:s0
+
+service wcnd_eng-cali /vendor/bin/connmgr -G
+    class cali
+    user root
+    group root system shell wifi inet bluetooth
+    disabled
+    oneshot
+    seclabel u:r:wcnd:s0
+
+service console-cali /system/bin/sh
+    console
+    class cali
+    user root
+    group root
+    seclabel u:r:shell:s0
+
+service vendor.mlogservice /vendor/bin/mlogservice
+    class main
+    user shell
+    group system root
+
+service engpcclient /vendor/bin/engpc
+    class cali
+    user root
+    group root sdcard_rw system radio shell net_bt_admin input audio
+
+service gpsd /vendor/bin/gpsd
+    class core
+    user system
+    group gps system shell inet net_raw wifi
+
+on init
+    # Apply strict SELinux checking of PROT_EXEC on mmap/mprotect calls.
+    write /sys/fs/selinux/checkreqprot 0
+    start healthd
+    chown system system /sys/bus/iio/devices/trigger0/name
+    chown system system /sys/bus/iio/devices/iio:device1/buffer
+    chown system system /sys/bus/iio/devices/iio:device1/buffer/length
+    chown system system /sys/bus/iio/devices/iio:device1/buffer/enable
+    chown system system /sys/bus/iio/devices/iio:device1/trigger/current_trigger
+    chmod 660 /sys/bus/iio/devices/trigger0/name
+    chmod 660 /sys/bus/iio/devices/iio:device1/buffer/length
+    chmod 660 /sys/bus/iio/devices/iio:device1/buffer/enable
+    chmod 660 /sys/bus/iio/devices/iio:device1/trigger/current_trigger
+
+    export PATH /sbin:/system/bin:/vendor/bin
+    export SECONDARY_STORAGE /storage/sdcard0
+
+    mkdir /storage
+    mkdir /storage/sdcard1
+    mkdir /storage/sdcard0
+    symlink /storage/sdcard0 /mnt/sdcard
+    symlink /system/etc/bluetooth /etc/bluetooth
+
+    mkdir /systeminfo 0777 system system
+
+    loglevel 7
+
+    chown system root /proc/mdbg/assert
+    chown system root /proc/mdbg/wdtirq
+    chown system root /proc/mdbg/at_cmd
+    chown system root /proc/mdbg/loopcheck
+
+    chmod 760 /proc/mdbg/assert
+    chmod 760 /proc/mdbg/wdtirq
+    chmod 760 /proc/mdbg/at_cmd
+    chmod 760 /proc/mdbg/loopcheck
+
+    chown system root /proc/cpwcn/wdtirq
+    chmod 766 /proc/cpwcn/wdtirq
+
+    # Create mount-point for ConfigFS USB gadgets
+    # Add standard gadget entries
+    mount configfs none /config
+    mkdir /config/usb_gadget/g1 0770 shell shell
+    write /config/usb_gadget/g1/idVendor 0x1782
+    write /config/usb_gadget/g1/idProduct 0x4d00
+    mkdir /config/usb_gadget/g1/strings/0x409 0770 shell shell
+    write /config/usb_gadget/g1/strings/0x409/serialnumber ${ro.serialno}
+    write /config/usb_gadget/g1/strings/0x409/manufacturer Unisoc
+    write /config/usb_gadget/g1/strings/0x409/product "Unisoc Phone"
+    mkdir /config/usb_gadget/g1/configs/b.1 0770 shell shell
+    mkdir /config/usb_gadget/g1/configs/b.1/strings/0x409 0770 shell shell
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "Conf 1"
+    write /config/usb_gadget/g1/configs/b.1/MaxPower 120
+
+    # Create adb+ffs gadget function
+    mkdir /config/usb_gadget/g1/functions/ffs.adb 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/ffs.fastboot 0770 shell shell
+    mkdir /dev/usb-ffs 0770 shell shell
+    mkdir /dev/usb-ffs/adb 0770 shell shell
+    mount functionfs adb /dev/usb-ffs/adb uid=2000,gid=2000
+    mkdir /dev/usb-ffs/fastboot 0770 system system
+    mount functionfs fastboot /dev/usb-ffs/fastboot rmode=0770,fmode=0660,uid=1000,gid=1000
+
+    # Create MTP and PTP functions
+    mkdir /config/usb_gadget/g1/functions/mtp.gs0 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/ptp.gs1 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/rndis.gs4 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/vser.gs7 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/accessory.gs2 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/audio_source.gs3 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/midi.gs5 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs0 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs1 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs2 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs3 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs4 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs5 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs6 0770 shell shell
+    mkdir /config/usb_gadget/g1/functions/gser.gs7 0770 shell shell
+
+on boot
+    setprop sys.usb.configfs 1
+    write /sys/block/mmcblk0boot0/force_ro 0
+    write /sys/block/mmcblk0boot1/force_ro 0
+
+    chown system system /dev/iio:device1
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/iio/trigger/current_trigger
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/batch
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/logctl
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/calibrator_cmd
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/calibrator_data
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/enable
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/flush
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/iio
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/version
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/op_download
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/mag_cali_flag
+    chown system system /sys/class/sprd_sensorhub/sensor_hub/sensorhub
+    #HS03 code for P211014-07931 by zhangziyi at 2021/10/18 start
+    chown system system /sys/class/leds/vibrator/state
+    chown system system /sys/class/leds/vibrator/duration
+    chown system system /sys/class/leds/vibrator/activate
+    #HS03 code for P211014-07931 by zhangziyi at 2021/10/18 end
+    #HS03  code for SR-SL6215-01-729 by shibinbin at 2021/09/02 start
+    chown system system /sys/bus/i2c/devices/3-0012/batch
+    chown system system /sys/bus/i2c/devices/3-0012/enable
+    #HS03  code for SR-SL6215-01-729 by shibinbin at 2021/09/02 end
+    #Tab A7 T618 code for SR-AX6189A-01-60 by zhangziyi at 2021/12/23 start
+    chown system system /sys/bus/i2c/devices/1-0012/batch
+    chown system system /sys/bus/i2c/devices/1-0012/enable
+    chown system system /sys/bus/i2c/devices/1-0012/aot_cali
+    chown system system /sys/module/aw9610x/parameters/sar_names
+    #Tab A7 T618 code for SR-AX6189A-01-60 by zhangziyi at 2021/12/23 end
+    #Tab A8 code for SR-AX6300-01-66 by mayuhang at 2021/9/8 start
+    chown system system /sys/class/sar/batch
+    chown system system /sys/class/sar/enable
+    chown system system /sys/class/sar/calibrate
+    #Tab A8 code for SR-AX6300-01-66 by mayuhang at 2021/9/8 end
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/iio/trigger/current_trigger
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/batch
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/logctl
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/calibrator_cmd
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/calibrator_data
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/enable
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/flush
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/iio
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/version
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/op_download
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/mag_cali_flag
+    chmod 660 /sys/class/sprd_sensorhub/sensor_hub/sensorhub
+    chmod 660 /sys/class/power_supply/battery/charger.0/stop_charge
+    chmod 660 /sys/class/power_supply/battery/charger.0/jeita_control
+    chmod 660 /sys/class/power_supply/battery/input_current_limit
+    chmod 660 /sys/class/power_supply/battery/constant_charge_current
+    #HS03 code for P211014-07931 by zhangziyi at 2021/10/18 start
+    chmod 664 /sys/class/leds/vibrator/state
+    chmod 664 /sys/class/leds/vibrator/duration
+    chmod 664 /sys/class/leds/vibrator/activate
+    #HS03 code for P211014-07931 by zhangziyi at 2021/10/18 end
+    #HS03  code for SR-SL6215-01-729 by shibinbin at 2021/09/02 start
+    chmod 660 /sys/bus/i2c/devices/3-0012/batch
+    chmod 660 /sys/bus/i2c/devices/3-0012/enable
+    #HS03  code for SR-SL6215-01-729 by shibinbin at 2021/09/02 end
+    #Tab A7 T618 code for SR-AX6189A-01-60 by zhangziyi at 2021/12/23 start
+    chmod 660 /sys/bus/i2c/devices/1-0012/batch
+    chmod 660 /sys/bus/i2c/devices/1-0012/enable
+    chmod 660 /sys/bus/i2c/devices/1-0012/aot_cali
+    chmod 660 /sys/module/aw9610x/parameters/sar_names
+    #Tab A7 T618 code for SR-AX6189A-01-60 by zhangziyi at 2021/12/23 end
+    #Tab A8 code for SR-AX6300-01-66 by mayuhang at 2021/9/8 start
+    chmod 660 /sys/class/sar/batch
+    chmod 660 /sys/class/sar/enable
+    chmod 660 /sys/class/sar/calibrate
+    #Tab A8 code for SR-AX6300-01-66 by mayuhang at 2021/9/8 end
+
+# Grip Sensor for unisoc sensor hub list
+    chown system radio /sys/class/sensors/grip_sensor/name
+    chown system radio /sys/class/sensors/grip_sensor/vendor
+    chown system radio /sys/class/sensors/grip_sensor/onoff
+
+on fs
+    #mkdir /data/misc/bluedroid 0770 bluetooth net_bt_stack
+    mkdir /data/misc/bluetooth 0770 system system
+
+on post-fs-data
+    # We chown/chmod /data again so because mount is run as root + defaults
+    chown system system /data
+    chmod 0771 /data
+    # We restorecon /data in case the userdata partition has been reset.
+    restorecon /data
+    mkdir /data/misc 01771 system misc
+    #mkdir /data/misc/bluedroid 0770 bluetooth net_bt_stack
+    mkdir /data/misc/bluetooth 0770 system system
+    copy /system/etc/bluetooth/bt_stack.conf /data/misc/bluedroid/bt_stack.conf
+    chown bluetooth system /data/misc/bluedroid/bt_stack.conf
+    chmod 0640 /data/misc/bluedroid/bt_stack.conf
+
+    chmod 666 /sys/module/shub_core/parameters/gryo_firms
+    chmod 666 /sys/module/shub_core/parameters/acc_firms
+    chmod 666 /sys/module/shub_core/parameters/mag_firms
+    chmod 666 /sys/module/shub_core/parameters/pressure_firms
+    chmod 666 /sys/module/shub_core/parameters/light_firms
+    chmod 666 /sys/module/shub_core/parameters/prox_firms
+    # Tab A8 code for AX6300DEV-43 by hujincan at 2021/08/17 start
+    chmod 666 /sys/module/shub_core/parameters/sensor_name
+    # Tab A8 code for AX6300DEV-43 by hujincan at 2021/08/17 end
+    chmod 666 /sys/module/firmware_class/parameters/path
+    chmod 666 /sys/module/shub_core/parameters/sensor_fusion_mode
+
+    #add wifi
+    mkdir /data/vendor/wifi 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa 0770 wifi wifi
+    mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
+    mkdir /data/system 0770 system system
+    mkdir /etc/wifi 0770 wifi wifi
+    write /data/vendor/wifi/fwpath sta_mode
+    chmod 660 /data/vendor/wifi/fwpath
+    chown wifi wifi /data/vendor/wifi/fwpath
+    rmdir /data/system/wpa_supplicant
+    mkdir /data/misc/dhcp 0770 dhcp dhcp
+
+    #to observe dnsmasq.leases file for dhcp information
+    chown dhcp system /data/misc/dhcp
+    setprop wifi.interface wlan0
+    mkdir /data/misc/dhcp6c 0770 dhcp dhcp
+    chown dhcp system /data/misc/dhcp6c
+
+    # Ylog dir on /data partition
+    mkdir /data/vendor 0751 root root
+    mkdir /data/vendor/local 0751 root root
+
+    # slogmodem config dir
+    mkdir /data/vendor/ylog 0770 shell system
+    mkdir /data/vendor/local/slogmodem 0770 shell system
+    mkdir /data/vendor/local/mlogservice 0770 shell system
+    mkdir /mnt/vendor/sensorhub 0777 system root
+    mkdir /mnt/vendor/productinfo 0771 system root
+    mkdir /mnt/vendor/productinfo/sensor_calibration_data 0770 system root
+    mkdir /data/vendor/local/otpdata 0777 system root
+
+on property:ro.debuggable=1
+    write /sys/module/smsg/parameters/debug_enable 1
+
+on property:ro.bootmode=recovery
+    class_start recovery
+
+on property:sys.usb.configfs=1 && property:sys.usb.ffs.ready=1 && property:sys.usb.config=adb,vser,gser
+    write /config/usb_gadget/g1/idVendor 0x1782
+    write /config/usb_gadget/g1/idProduct 0x5d06
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb_vser_gser"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
+    rm /config/usb_gadget/g1/configs/b.1/f4
+    rm /config/usb_gadget/g1/configs/b.1/f5
+    rm /config/usb_gadget/g1/configs/b.1/f6
+    rm /config/usb_gadget/g1/configs/b.1/f7
+    rm /config/usb_gadget/g1/configs/b.1/f8
+    rm /config/usb_gadget/g1/configs/b.1/f9
+    rm /config/usb_gadget/g1/configs/b.1/f10
+    rm /config/usb_gadget/g1/configs/b.1/f11
+
+    symlink /config/usb_gadget/g1/functions/ffs.adb  /config/usb_gadget/g1/configs/b.1/f1
+    symlink /config/usb_gadget/g1/functions/vser.gs7 /config/usb_gadget/g1/configs/b.1/f2
+    symlink /config/usb_gadget/g1/functions/gser.gs0 /config/usb_gadget/g1/configs/b.1/f3
+
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.configfs=1 && property:sys.usb.config=vser
+    write /config/usb_gadget/g1/idVendor 0x1782
+    write /config/usb_gadget/g1/idProduct 0x4d00
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "vser"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
+    rm /config/usb_gadget/g1/configs/b.1/f4
+    rm /config/usb_gadget/g1/configs/b.1/f5
+    rm /config/usb_gadget/g1/configs/b.1/f6
+    rm /config/usb_gadget/g1/configs/b.1/f7
+    rm /config/usb_gadget/g1/configs/b.1/f8
+    rm /config/usb_gadget/g1/configs/b.1/f9
+    rm /config/usb_gadget/g1/configs/b.1/f10
+    rm /config/usb_gadget/g1/configs/b.1/f11
+
+    symlink /config/usb_gadget/g1/functions/vser.gs7 /config/usb_gadget/g1/configs/b.1/f1
+
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:ro.bootmode=cali
+    # Enables vser port
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "vser"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    symlink /config/usb_gadget/g1/functions/vser.gs7 /config/usb_gadget/g1/configs/b.1/f1
+
+    mount_all /etc/recovery.tmpfsdata.fstab
+    mount tmpfs tmpfs /data mode=0777
+    mkdir /system 0755 root root
+    symlink /system_root/system /system
+    chown system system /data
+    trigger post-fs
+    trigger post-fs-data
+    chmod 0771 /data
+    restorecon /data
+    mkdir /data/local 0751 root root
+    mkdir /data/local/media 0751 media media
+
+    mkdir /data/vendor/local/mlogservice 0770 shell system
+    mkdir /data/vendor 0751 root root
+    mkdir /data/vendor/local 0751 root root
+    mkdir /data/vendor/local/media 0770 audioserver system
+
+    mkdir /data/sprd_ss 0770 system system
+    class_start cali
+
+    # ToDo: insmod .../${ro.gpu.name}.ko
+    insmod /mnt/product/socko/pvrsrvkm.ko
+    insmod /mnt/product/socko/mali_gondul.ko
+    insmod /mnt/product/socko/mali_kbase.ko
+
+    #gnss libgps
+    mkdir /data/vendor/gnss/ 0776 system system
+    mkdir /data/vendor/gnss/bin/ 0776 system system
+    mkdir /data/vendor/gnss/supl/ 0776 system system
+    mkdir /data/vendor/gnss/config/ 0776 system system
+    mkdir /data/vendor/gnss/lte/ 0776 system system
+    chown system system /data/vendor/gnss/bin/gnssmodem.bin
+    chown system system /data/vendor/gnss/config/config.xml
+    chown system system /data/vendor/gnss/supl/supl.xml
+    chown system system /data/vendor/gnss/supl/spirentroot.cer
+    chown system system /data/vendor/gnss/lte/ext.eph
+    chown system system /data/vendor/gnss/lte/jpleph.405
+    chown system system /data/vendor/gnss/lte/raw.obs
+    chown system system /data/vendor/gnss/gnss.log
+    chown system system /data/vendor/gnss/nmea.log
+    chown system system /mnt/vendor/tsx.dat
+    chown system system /mnt/vendor/txdata.txt
+    chown system system /data/vendor/gnss/FlashCfg.cg
+    chmod 666 /data/vendor/gnss/bin/gnssmodem.bin
+    chmod 666 /data/vendor/gnss/config/config.xml
+    chmod 660 /data/vendor/gnss/supl/supl.xml
+    chmod 660 /data/vendor/gnss/supl/spirentroot.cer
+    chmod 666 /data/vendor/gnss/lte/ext.eph
+    chmod 666 /data/vendor/gnss/lte/jpleph.405
+    chmod 660 /data/vendor/gnss/lte/raw.obs
+    chmod 666 /data/vendor/gnss/gnss.log
+    chmod 666 /data/vendor/gnss/nmea.log
+    chmod 666 /mnt/vendor/tsx.dat
+    chmod 666 /mnt/vendor/txdata.txt
+    chmod 666 /data/vendor/gnss/FlashCfg.cg
+
+    start hwservicemanager
+    start vendor.slogmodem
+    start vendor.cp_diskserver
+    start vendor.mlogservice
+
+on property:ro.bootmode=factorytest
+    setprop sys.usb.config adb,vser,gser
+
+    mount_all /etc/recovery.tmpfsdata.fstab
+    mount tmpfs tmpfs /data mode=0777
+    mkdir /system 0755 root root
+    symlink /system_root/system /system
+    trigger post-fs
+    trigger post-fs-data
+    chown system system /data
+    chmod 0771 /data
+    chown system system /dev/adf0
+    chown system system /dev/adf-interface0.0
+    chown system system /dev/adf-overlay-engine0.0
+    mkdir /data/local 0751 root root
+    mkdir /data/vendor 0751 root root
+    mkdir /data/local/media 0751 media media
+
+    mkdir /data/misc 01771 system misc
+    mkdir /data/misc/media 0700 media media
+    mkdir /data/misc/audioserver 0700 audioserver audioserver
+    mkdir /data/misc/cameraserver 0700 cameraserver cameraserver
+    mkdir /data/vendor/cameraserver 0700 cameraserver cameraserver
+    mkdir /mnt/vendor/productinfo/otpdata 0777 system root
+
+    # Support audio test
+    mkdir /data/vendor/local 0751 root root
+    mkdir /data/vendor/local/media 0770 audioserver system
+
+    # ToDo: insmod .../${ro.gpu.name}.ko
+    insmod /mnt/product/socko/pvrsrvkm.ko
+    insmod /mnt/product/socko/mali_gondul.ko
+    insmod /mnt/product/socko/mali_kbase.ko
+
+    #gnss
+    mkdir /data/vendor/gnss/ 0776 system system
+    mkdir /data/vendor/gnss/bin/ 0776 system system
+    mkdir /data/vendor/gnss/supl/ 0776 system system
+    mkdir /data/vendor/gnss/config/ 0776 system system
+    mkdir /data/vendor/gnss/lte/ 0776 system system
+    chown system system /data/vendor/gnss/bin/gnssmodem.bin
+    chown system system /data/vendor/gnss/config/config.xml
+    chown system system /data/vendor/gnss/supl/supl.xml
+    chown system system /data/vendor/gnss/supl/spirentroot.cer
+    chown system system /data/vendor/gnss/lte/ext.eph
+    chown system system /data/vendor/gnss/lte/jpleph.405
+    chown system system /data/vendor/gnss/lte/raw.obs
+    chown system system /data/vendor/gnss/gnss.log
+    chown system system /data/vendor/gnss/nmea.log
+    chown system system /mnt/vendor/tsx.dat
+    chown system system /mnt/vendor/txdata.txt
+    chown system system /data/vendor/gnss/FlashCfg.cg
+    chmod 666 /data/vendor/gnss/bin/gnssmodem.bin
+    chmod 666 /data/vendor/gnss/config/config.xml
+    chmod 660 /data/vendor/gnss/supl/supl.xml
+    chmod 660 /data/vendor/gnss/supl/spirentroot.cer
+    chmod 666 /data/vendor/gnss/lte/ext.eph
+    chmod 666 /data/vendor/gnss/lte/jpleph.405
+    chmod 660 /data/vendor/gnss/lte/raw.obs
+    chmod 666 /data/vendor/gnss/gnss.log
+    chmod 666 /data/vendor/gnss/nmea.log
+    chmod 666 /mnt/vendor/tsx.dat
+    chmod 666 /mnt/vendor/txdata.txt
+    chmod 666 /data/vendor/gnss/FlashCfg.cg
+
+    chown system system /sys/class/misc/gnss_common_ctl/gnss_power_enable
+    chown system system /sys/class/misc/gnss_common_ctl/gnss_dump
+    chown system system /sys/class/misc/gnss_common_ctl/gnss_subsys
+    chown system system /dev/gnss_pmnotify_ctl
+    chmod  220 /sys/class/misc/gnss_common_ctl/gnss_power_enable
+    chmod 660 /sys/class/misc/gnss_common_ctl/gnss_dump
+    chmod 660 /sys/class/misc/gnss_common_ctl/gnss_subsys
+    chmod 660  /dev/gnss_pmnotify_ctl
+
+    mkdir /data/misc 01771 system misc
+    start vendor.cp_diskserver
+    start vendor.slogmodem
+    start vendor.mlogservice
+    trigger factorytest
+
+on property:ro.bootmode=factorytest && property:ro.debuggable=0
+    setprop sys.usb.config vser
