@@ -1,0 +1,97 @@
+# Copyright (c) 2018-2019 The Linux Foundation. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials provided
+#      with the distribution.
+#
+#    * Neither the name of The Linux Foundation nor the names of its
+#      contributors may be used to endorse or promote products derived
+#      from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Android fstab file.
+# The filesystem that contains the filesystem checker binary (typically /system) cannot
+# specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
+
+#<src>                                    <mnt_point>    <type>    <mnt_flags and options>    <fs_mgr_flags>
+/spl                 emmc      /dev/block/mmcblk0boot0              flags=display=spl
+/spl_bk              emmc      /dev/block/mmcblk0boot1              flags=display=spl_bk
+/uboot               emmc      /dev/block/by-name/uboot             flags=display=uboot
+/sml                 emmc      /dev/block/by-name/sml               flags=display=sml
+/tos                 emmc      /dev/block/by-name/trustos           flags=display=tos
+/teecfg              emmc      /dev/block/by-name/teecfg            flags=display=teecfg
+/vbmeta              emmc      /dev/block/by-name/vbmeta            flags=display=vbmeta
+/vbmeta_system       emmc      /dev/block/by-name/vbmeta_system     flags=display=vbmeta_system
+/vbmeta_vendor       emmc      /dev/block/by-name/vbmeta_vendor     flags=display=vbmeta_vendor
+/dtbo                emmc      /dev/block/by-name/dtbo              flags=display=dtbo
+/ltedsp              emmc      /dev/block/by-name/l_ldsp            flags=display=ltedsp
+/ltegdsp             emmc      /dev/block/by-name/l_gdsp            flags=display=ltegdsp
+/lteagdsp            emmc      /dev/block/by-name/l_agdsp           flags=display=lteagdsp
+/ltecdsp             emmc      /dev/block/by-name/l_cdsp            flags=display=ltecdsp
+/ltemodem            emmc      /dev/block/by-name/l_modem           flags=display=ltemodem
+/ltefixnv1           emmc      /dev/block/by-name/l_fixnv1          flags=display=ltefixnv1
+/ltefixnv2           emmc      /dev/block/by-name/l_fixnv2          flags=display=ltefixnv2
+/ltedeltanv          emmc      /dev/block/by-name/l_deltanv         flags=display=ltedeltanv
+/wcnmodem            emmc      /dev/block/by-name/wcnmodem          flags=display=wcnmodem
+/gnssmodem           emmc      /dev/block/by-name/gnssmodem         flags=display=gnssmodem
+/pmsys               emmc      /dev/block/by-name/pm_sys            flags=display=pmsys
+/misc                emmc      /dev/block/by-name/misc              flags=display=misc
+/boot                emmc      /dev/block/by-name/boot              flags=display=boot
+/recovery            emmc      /dev/block/by-name/recovery          flags=display=recovery
+/persist             emmc      /dev/block/by-name/persist           flags=display=persist
+/logo                emmc      /dev/block/by-name/logo              flags=display=logo
+/fbootlogo           emmc      /dev/block/by-name/fbootlogo         flags=display=fbootlogo
+/system              ext4      system                               flags=display=system;logical
+/system_ext          ext4      system_ext                           flags=display=system_ext;logical
+/vendor              ext4      vendor                               flags=display=vendor;logical
+/product             ext4      product                              flags=display=product;logical
+/metadata            ext4      /dev/block/by-name/metadata          flags=display=metadata
+/socko               ext4      /dev/block/by-name/socko             flags=display=socko
+/odmko               ext4      /dev/block/by-name/odmko             flags=display=odmko
+/cache               ext4      /dev/block/by-name/cache             flags=display=cache
+/mnt/vendor          ext4      /dev/block/by-name/prodnv            flags=display=vendor
+/data                f2fs      /dev/block/by-name/userdata          flags=display=data
+/sdcard              sdfat     /dev/block/mmcblk1p1                 flags=display=sdcard
+/efs                 ext4      /dev/block/by-name/sec_efs           flags=display=efs
+/sec_efs             ext4      /dev/block/by-name/sec_efs           flags=display=sec_efs
+/prism               ext4      /dev/block/by-name/prism             flags=display=prism
+/optics              ext4      /dev/block/by-name/optics            flags=display=optics
+/deltanv             emmc      /dev/block/by-name/l_deltanv         flags=display=deltanv
+/nvitem              emmc      /dev/block/by-name/l_fixnv2          flags=display=nvitem
+/qogirl6_m3l_cm4     emmc      /dev/block/by-name/pm_sys            flags=display=qogirl6_m3l_cm4
+
+
+BOARD_SUPER_PARTITION_SIZE := 9126805504
+BOARD_SUPER_PARTITION_GROUPS := android_dynamic_partitions
+BOARD_ANDROID_DYNAMIC_PARTITIONS_SIZE := 9122611200
+BOARD_ANDROID_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor product odm
+
+system /system ext4 ro,barrier=1 wait,avb=vbmeta_system,logical,first_stage_mount
+system_ext /system_ext ext4 ro,barrier=1 wait,avb=vbmeta_system_ext,logical,first_stage_mount
+vendor /vendor ext4 ro,barrier=1 wait,avb=vbmeta_vendor,logical,first_stage_mount
+product /product ext4 ro,barrier=1 wait,avb=vbmeta,logical,first_stage_mount
+
+/dev/block/by-name/metadata /metadata    ext4   nodev,noatime,nosuid,errors=panic	wait,formattable,first_stage_mount,check
+/dev/block/by-name/cache    /cache       ext4   noatime,nosuid,nodev,nomblk_io_submit,noauto_da_alloc	wait,check
+/dev/block/by-name/userdata /data        f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678	latemount,wait,encryptable,check,reservedsize=128M,checkpoint=fs,,quota
