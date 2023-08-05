@@ -1,0 +1,11 @@
+/dev/block/by-name/miscdata       0660     system      system
+/dev/block/by-name/persist       0660     system      system
+/dev/block/by-name/sysdumpdb        0660     system     system
+/dev/block/by-name/pad        0660     system     system
+/dev/block/by-name/param	0660	root	system
+
+# Google FRP solution
+/dev/block/by-name/persistent    0660    system    system
+
+# Reactivation lock
+/dev/block/by-name/steady    0660    system    system
