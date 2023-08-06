@@ -81,6 +81,7 @@
 /nvitem              emmc      /dev/block/by-name/l_fixnv2          flags=display=nvitem
 /qogirl6_m3l_cm4     emmc      /dev/block/by-name/pm_sys            flags=display=qogirl6_m3l_cm4
 
+;backup=1;flashimg
 
 BOARD_SUPER_PARTITION_SIZE := 9126805504
 BOARD_SUPER_PARTITION_GROUPS := android_dynamic_partitions
