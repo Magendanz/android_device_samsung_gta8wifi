@@ -1,6 +1,7 @@
 #add for board init.rc for recovery mode
 import /init.recovery.common.rc
- wait /dev/block/platform/soc/${ro.boot.bootdevice}
+ 
+wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     
     export ANDROID_ROOT /system_root
