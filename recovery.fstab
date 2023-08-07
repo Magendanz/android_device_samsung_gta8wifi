@@ -65,10 +65,12 @@
 /dev/block/by-name/logo                  /logo               emmc    defaults    defaults
 /dev/block/by-name/fbootlogo             /fbootlogo          emmc    defaults    defaults
 
-system /system ext4 ro,barrier=1 wait,avb=vbmeta_system,logical,first_stage_mount
-system_ext /system_ext ext4 ro,barrier=1 wait,avb=vbmeta_system_ext,logical,first_stage_mount
-vendor /vendor ext4 ro,barrier=1 wait,avb=vbmeta_vendor,logical,first_stage_mount
-product /product ext4 ro,barrier=1 wait,avb=vbmeta,logical,first_stage_mount
+#<src>					<mnt_point>	<type>	<mnt_flags and options>		<fs_mgr_flags>
+system					/system		ext4	ro				wait,logical,first_stage_mount
+system					/system		f2fs	ro				wait,logical,first_stage_mount
+vendor					/vendor		ext4	ro				wait,logical,first_stage_mount
+product					/product	ext4	ro				wait,logical,first_stage_mount
+odm					/odm		ext4	ro				wait,logical,first_stage_mount
 
 /dev/block/by-name/metadata /metadata    ext4   nodev,noatime,nosuid,errors=panic	wait,formattable,first_stage_mount,check
 /dev/block/by-name/cache    /cache       ext4   noatime,nosuid,nodev,nomblk_io_submit,noauto_da_alloc	wait,check
