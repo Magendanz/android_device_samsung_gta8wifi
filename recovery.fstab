@@ -35,59 +35,35 @@
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 
 #<src>                                    <mnt_point>    <type>    <mnt_flags and options>    <fs_mgr_flags>
-/spl                 emmc      /dev/block/mmcblk0boot0              flags=display=spl
-/spl_bk              emmc      /dev/block/mmcblk0boot1              flags=display=spl_bk
-/uboot               emmc      /dev/block/by-name/uboot             flags=display=uboot
-/sml                 emmc      /dev/block/by-name/sml               flags=display=sml
-/tos                 emmc      /dev/block/by-name/trustos           flags=display=tos
-/teecfg              emmc      /dev/block/by-name/teecfg            flags=display=teecfg
-/vbmeta              emmc      /dev/block/by-name/vbmeta            flags=display=vbmeta
-/vbmeta_system       emmc      /dev/block/by-name/vbmeta_system     flags=display=vbmeta_system
-/vbmeta_vendor       emmc      /dev/block/by-name/vbmeta_vendor     flags=display=vbmeta_vendor
-/dtbo                emmc      /dev/block/by-name/dtbo              flags=display=dtbo
-/ltedsp              emmc      /dev/block/by-name/l_ldsp            flags=display=ltedsp
-/ltegdsp             emmc      /dev/block/by-name/l_gdsp            flags=display=ltegdsp
-/lteagdsp            emmc      /dev/block/by-name/l_agdsp           flags=display=lteagdsp
-/ltecdsp             emmc      /dev/block/by-name/l_cdsp            flags=display=ltecdsp
-/ltemodem            emmc      /dev/block/by-name/l_modem           flags=display=ltemodem
-/ltefixnv1           emmc      /dev/block/by-name/l_fixnv1          flags=display=ltefixnv1
-/ltefixnv2           emmc      /dev/block/by-name/l_fixnv2          flags=display=ltefixnv2
-/ltedeltanv          emmc      /dev/block/by-name/l_deltanv         flags=display=ltedeltanv
-/wcnmodem            emmc      /dev/block/by-name/wcnmodem          flags=display=wcnmodem
-/gnssmodem           emmc      /dev/block/by-name/gnssmodem         flags=display=gnssmodem
-/pmsys               emmc      /dev/block/by-name/pm_sys            flags=display=pmsys
-/misc                emmc      /dev/block/by-name/misc              flags=display=misc
-/boot                emmc      /dev/block/by-name/boot              flags=display=boot
-/recovery            emmc      /dev/block/by-name/recovery          flags=display=recovery
-/persist             emmc      /dev/block/by-name/persist           flags=display=persist
-/logo                emmc      /dev/block/by-name/logo              flags=display=logo
-/fbootlogo           emmc      /dev/block/by-name/fbootlogo         flags=display=fbootlogo
-/system              ext4      system                               flags=display=system;logical
-/system_ext          ext4      system_ext                           flags=display=system_ext;logical
-/vendor              ext4      vendor                               flags=display=vendor;logical
-/product             ext4      product                              flags=display=product;logical
-/metadata            ext4      /dev/block/by-name/metadata          flags=display=metadata
-/socko               ext4      /dev/block/by-name/socko             flags=display=socko
-/odmko               ext4      /dev/block/by-name/odmko             flags=display=odmko
-/cache               ext4      /dev/block/by-name/cache             flags=display=cache
-/mnt/vendor          ext4      /dev/block/by-name/prodnv            flags=display=vendor
-/data                f2fs      /dev/block/by-name/userdata          flags=display=data
-/sdcard              sdfat     /dev/block/mmcblk1p1                 flags=display=sdcard
-/efs                 ext4      /dev/block/by-name/sec_efs           flags=display=efs
-/sec_efs             ext4      /dev/block/by-name/sec_efs           flags=display=sec_efs
-/prism               ext4      /dev/block/by-name/prism             flags=display=prism
-/optics              ext4      /dev/block/by-name/optics            flags=display=optics
-/deltanv             emmc      /dev/block/by-name/l_deltanv         flags=display=deltanv
-/nvitem              emmc      /dev/block/by-name/l_fixnv2          flags=display=nvitem
-/qogirl6_m3l_cm4     emmc      /dev/block/by-name/pm_sys            flags=display=qogirl6_m3l_cm4
+/dev/block/mmcblk0boot0                  /spl                emmc    defaults    defaults
+/dev/block/mmcblk0boot1                  /spl_bk             emmc    defaults    defaults
+/dev/block/by-name/uboot                 /uboot              emmc    defaults    defaults
+/dev/block/by-name/sml                   /sml                emmc    defaults    defaults
+/dev/block/by-name/trustos               /tos                emmc    defaults    defaults
+/dev/block/by-name/teecfg                /teecfg             emmc    defaults    defaults
+/dev/block/by-name/vbmeta                /vbmeta             emmc    defaults    defaults
+/dev/block/by-name/vbmeta_system         /vbmeta_system      emmc    defaults    defaults
+/dev/block/by-name/vbmeta_vendor         /vbmeta_vendor      emmc    defaults    defaults
+/dev/block/by-name/dtbo                  /dtbo               emmc    defaults    defaults
 
-;backup=1;flashimg
+/dev/block/by-name/l_ldsp                /ltedsp             emmc    defaults    defaults
+/dev/block/by-name/l_gdsp                /ltegdsp            emmc    defaults    defaults
+/dev/block/by-name/l_agdsp               /lteagdsp           emmc    defaults    defaults
+/dev/block/by-name/l_cdsp                /ltecdsp            emmc    defaults    defaults
+/dev/block/by-name/l_modem               /ltemodem           emmc    defaults    defaults
+/dev/block/by-name/l_fixnv1              /ltefixnv1          emmc    defaults    defaults
+/dev/block/by-name/l_fixnv2              /ltefixnv2          emmc    defaults    defaults
+/dev/block/by-name/l_deltanv             /ltedeltanv         emmc    defaults    defaults
+/dev/block/by-name/wcnmodem              /wcnmodem           emmc    defaults    defaults
+/dev/block/by-name/gnssmodem             /gnssmodem          emmc    defaults    defaults
+/dev/block/by-name/pm_sys                /pmsys              emmc    defaults    defaults
 
-
-BOARD_SUPER_PARTITION_SIZE := 9126805504
-BOARD_SUPER_PARTITION_GROUPS := android_dynamic_partitions
-BOARD_ANDROID_DYNAMIC_PARTITIONS_SIZE := 9122611200
-BOARD_ANDROID_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor product odm
+/dev/block/by-name/misc                  /misc               emmc    defaults    defaults
+/dev/block/by-name/boot                  /boot               emmc    defaults    defaults
+/dev/block/by-name/recovery              /recovery           emmc    defaults    defaults
+/dev/block/by-name/persist               /persist            emmc    defaults    defaults
+/dev/block/by-name/logo                  /logo               emmc    defaults    defaults
+/dev/block/by-name/fbootlogo             /fbootlogo          emmc    defaults    defaults
 
 system /system ext4 ro,barrier=1 wait,avb=vbmeta_system,logical,first_stage_mount
 system_ext /system_ext ext4 ro,barrier=1 wait,avb=vbmeta_system_ext,logical,first_stage_mount
@@ -97,3 +73,5 @@ product /product ext4 ro,barrier=1 wait,avb=vbmeta,logical,first_stage_mount
 /dev/block/by-name/metadata /metadata    ext4   nodev,noatime,nosuid,errors=panic	wait,formattable,first_stage_mount,check
 /dev/block/by-name/cache    /cache       ext4   noatime,nosuid,nodev,nomblk_io_submit,noauto_da_alloc	wait,check
 /dev/block/by-name/userdata /data        f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678	latemount,wait,encryptable,check,reservedsize=128M,checkpoint=fs,,quota
+
+;backup=1;flashimg
