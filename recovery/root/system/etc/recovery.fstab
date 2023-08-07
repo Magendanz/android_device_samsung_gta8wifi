@@ -75,3 +75,8 @@ product /product ext4 ro,barrier=1 wait,avb=vbmeta,logical,first_stage_mount
 /dev/block/by-name/userdata /data        f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678	latemount,wait,encryptable,check,reservedsize=128M,checkpoint=fs,,quota
 
 ;backup=1;flashimg
+
+BOARD_SUPER_PARTITION_SIZE := 9126805504
+BOARD_SUPER_PARTITION_GROUPS := android_dynamic_partitions
+BOARD_ANDROID_DYNAMIC_PARTITIONS_SIZE := 9122611200
+BOARD_ANDROID_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor product odm
